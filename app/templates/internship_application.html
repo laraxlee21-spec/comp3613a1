@@ -1,0 +1,45 @@
+{% extends "authenticated-base.html" %}
+{% block title %}Submit Internship Application | Internship Platform{% endblock %}
+
+{% block subpage_content %}
+<main class="container-fluid py-2">
+    <div class="mx-auto" style="max-width: 48rem">
+        <h1 class="mb-2">Submit Internship Application</h1>
+        <p class="text-secondary mb-4">Applying for: {{ listing.title }}</p>
+
+        <form method="post" action="{{ url_for('submit_internship_application') }}">
+            <input type="hidden" name="listing_id" value="{{ listing.listing_id }}">
+
+            <div class="mb-3">
+                <label class="form-label" for="full_name">Full Name</label>
+                <input class="form-control" id="full_name" name="full_name" required
+                       value="{{ profile.full_name if profile else '' }}">
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="email">Email Address</label>
+                <input class="form-control" id="email" name="email" type="email" required
+                       value="{{ account_email }}">
+                <div class="form-text">Use the email address associated with your signed-in account.</div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="programme_of_study">Programme of Study</label>
+                <input class="form-control" id="programme_of_study" name="programme_of_study" required
+                       value="{{ profile.programme_of_study if profile else '' }}">
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="skills">Skills</label>
+                <textarea class="form-control" id="skills" name="skills" rows="3" required>{{ profile.skills if profile else '' }}</textarea>
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="certifications">Certifications</label>
+                <textarea class="form-control" id="certifications" name="certifications" rows="3" required>{{ profile.certifications if profile else '' }}</textarea>
+            </div>
+            <div class="mb-4">
+                <label class="form-label" for="career_interests">Career Interests</label>
+                <textarea class="form-control" id="career_interests" name="career_interests" rows="3" required>{{ profile.career_interests if profile else '' }}</textarea>
+            </div>
+            <button class="btn btn-primary btn-lg" type="submit">Submit Application</button>
+        </form>
+    </div>
+</main>
+{% endblock %}

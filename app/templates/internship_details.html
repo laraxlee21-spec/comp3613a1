@@ -1,0 +1,60 @@
+{% extends "authenticated-base.html" %}
+{% block title %}{{ listing.title }} | Internship Platform{% endblock %}
+
+{% block subpage_content %}
+<main class="container-fluid py-2">
+    <p class="text-uppercase small fw-semibold mb-1">{{ listing.company.company_name }}</p>
+    <h1 class="mb-4">{{ listing.title }}</h1>
+
+    <section class="card border-0 shadow-sm mb-3">
+        <div class="card-body p-4">
+            <dl class="row mb-0">
+                <dt class="col-sm-3">Internship Title</dt>
+                <dd class="col-sm-9">{{ listing.title }}</dd>
+                <dt class="col-sm-3">Company</dt>
+                <dd class="col-sm-9">{{ listing.company.company_name }}</dd>
+                <dt class="col-sm-3">Location</dt>
+                <dd class="col-sm-9">{{ listing.location }}</dd>
+                <dt class="col-sm-3">Available Positions</dt>
+                <dd class="col-sm-9">{{ listing.number_of_positions }}</dd>
+                <dt class="col-sm-3">Duration</dt>
+                <dd class="col-sm-9">{{ listing.duration or "Not specified" }}</dd>
+            </dl>
+        </div>
+    </section>
+
+    <section class="card border-0 shadow-sm mb-3">
+        <div class="card-body p-4">
+            <h2 class="h5">Description</h2>
+            <p class="mb-0">{{ listing.description }}</p>
+        </div>
+    </section>
+
+    <section class="card border-0 shadow-sm mb-3">
+        <div class="card-body p-4">
+            <h2 class="h5">Required Skills</h2>
+            <p class="mb-0">{{ listing.skills }}</p>
+        </div>
+    </section>
+
+    <section class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-4">
+            <h2 class="h5">Qualifications and Requirements</h2>
+            {% if listing.requirements %}
+            <p class="mb-0" style="white-space: pre-line">{{ listing.requirements }}</p>
+            {% else %}
+            <p class="mb-0">No additional requirements specified.</p>
+            {% endif %}
+        </div>
+    </section>
+
+    <div class="d-flex flex-wrap justify-content-between gap-2">
+        <a class="btn btn-outline-secondary"
+           href="{{ url_for('browse_internships_view') }}">Back to Listings</a>
+        <a class="btn btn-primary"
+           href="{{ url_for('select_internship_view', listing_id=listing.listing_id) }}">
+            Apply for Internship
+        </a>
+    </div>
+</main>
+{% endblock %}

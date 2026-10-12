@@ -1,0 +1,76 @@
+{% extends "authenticated-base.html" %}
+{% block title %}Browse Internships | Internship Platform{% endblock %}
+
+{% block additional_styles %}
+<style>
+    .internship-card {
+        border: 1px solid color-mix(in srgb, var(--brand-accent) 16%, white);
+        border-radius: var(--brand-radius);
+    }
+
+    .internship-location,
+    .internship-skills {
+        color: var(--brand-muted);
+    }
+
+    .internship-location {
+        white-space: nowrap;
+    }
+</style>
+{% endblock %}
+
+{% block subpage_content %}
+<main class="container-fluid py-2">
+    <div class="mb-4">
+        <p class="text-uppercase small fw-semibold mb-1">Student opportunities</p>
+        <h1 class="mb-1">Browse Internships</h1>
+        <p class="text-secondary mb-0">Explore roles and find an opportunity that fits your skills.</p>
+    </div>
+
+    <form class="row g-2 mb-4" method="get" action="{{ url_for('browse_internships_view') }}">
+        <div class="col">
+            <label class="visually-hidden" for="internship-search">Search internships</label>
+            <input class="form-control form-control-lg" id="internship-search" name="q"
+                   type="search" value="{{ search_query }}"
+                   placeholder="Search internships by title or skill">
+        </div>
+        <div class="col-auto">
+            <button class="btn btn-primary btn-lg" type="submit">Search</button>
+        </div>
+    </form>
+
+    {% if listings %}
+    <div class="d-grid gap-3">
+        {% for listing in listings %}
+        <article class="card internship-card shadow-sm">
+            <div class="card-body p-4">
+                <div class="d-flex flex-wrap justify-content-between gap-3 mb-3">
+                    <div>
+                        <h2 class="h4 mb-1">{{ listing.title }}</h2>
+                        <p class="text-secondary mb-0">{{ listing.company.company_name }}</p>
+                    </div>
+                    <span class="internship-location">{{ listing.location }}</span>
+                </div>
+                <p>{{ listing.description }}</p>
+                <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+                    <span class="internship-skills">{{ listing.skills }}</span>
+                    <span>Available positions: <strong>{{ listing.number_of_positions }}</strong></span>
+                    <a class="btn btn-outline-secondary"
+                       href="{{ url_for('internship_details_view', listing_id=listing.listing_id) }}">
+                        View Details
+                    </a>
+                </div>
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-4">
+            <h2 class="h5">No internships found</h2>
+            <p class="mb-0">Try another title or skill, or clear your search.</p>
+        </div>
+    </div>
+    {% endif %}
+</main>
+{% endblock %}

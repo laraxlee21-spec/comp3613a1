@@ -1,0 +1,47 @@
+{% extends "authenticated-base.html" %}
+{% block title %}My Listings | Internship Platform{% endblock %}
+
+{% block subpage_content %}
+<main class="container-fluid py-2">
+  <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+    <div>
+      <p class="text-uppercase small fw-semibold mb-1">Company workspace</p>
+      <h1 class="mb-0">My Listings</h1>
+    </div>
+    <a class="btn btn-primary" href="{{ url_for('company_create_listing_view') }}">Create Listing</a>
+  </div>
+
+  {% if listings %}
+  <div class="d-grid gap-3">
+    {% for listing in listings %}
+    <article class="card border-0 shadow-sm">
+      <div class="card-body p-4">
+        <div class="d-flex flex-wrap justify-content-between gap-3 mb-2">
+          <div>
+            <h2 class="h4 mb-1">{{ listing.title }}</h2>
+            <span class="text-secondary">{{ listing.location }}</span>
+          </div>
+          <span class="badge text-bg-light align-self-start">
+            {{ listing.number_of_positions }} available
+          </span>
+        </div>
+        <p>{{ listing.description }}</p>
+        <p class="mb-1"><strong>Required Skills:</strong> {{ listing.skills }}</p>
+        <p class="mb-0" style="white-space: pre-line">
+          <strong>Qualifications / Requirements:</strong> {{ listing.requirements }}
+        </p>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+  {% else %}
+  <section class="card border-0 shadow-sm">
+    <div class="card-body p-4">
+      <h2 class="h5">No listings yet</h2>
+      <p class="mb-3">Create your first internship listing to share it with students.</p>
+      <a class="btn btn-primary" href="{{ url_for('company_create_listing_view') }}">Create Listing</a>
+    </div>
+  </section>
+  {% endif %}
+</main>
+{% endblock %}

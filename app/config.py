@@ -3,7 +3,7 @@ import os
 import re
 from pathlib import Path
 
-from pydantic import field_validator
+from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 # Prefer a real .env; fall back to committed examples for first-run clones.
@@ -99,6 +99,7 @@ class Settings(BaseSettings):
     secret_key: str
     env: str
     config_password: str = ""
+    admin_initial_password: str = Field(default="", repr=False)
     jwt_algorithm: str = "HS256"
     jwt_access_token_expires: int = 30
     app_host: str = "0.0.0.0"

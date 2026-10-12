@@ -84,7 +84,7 @@ Defaults use a local SQLite file (`database.db`). Change `SECRET_KEY` before any
 
 ### 4. Initialise the database (Python CLI)
 
-Creates tables (drops existing by default) **and seeds demo users**:
+Creates tables (drops existing by default), seeds demo users, and inserts the three internship examples from the student wireframes. `bob / bobpass` is a public demo credential and may also be seeded in production. `admin / adminpass` is a local-development default; production Administrator provisioning is described below.
 
 ```bash
 python manage.py init
@@ -95,14 +95,16 @@ python manage.py init
 | `bob`    | `bobpass`   | regular_user |
 | `admin`  | `adminpass` | admin        |
 
+Companies can self-register at `/register/company`. The local SQLite database includes the nullable `company.user_id` schema addition; other existing databases need the equivalent additive migration before use. Do not run the default destructive `init` command to apply a schema change.
+
 Flags:
 
 ```bash
 python manage.py init --no-drop   # create/seed without dropping
-python manage.py init --no-seed   # tables only (skip demo users)
+python manage.py init --no-seed   # tables only (skip demo users and sample internships)
 ```
 
-Seeding skips usernames that already exist. Add more rows in `cmd_seed` in `app/cli.py`. `python manage.py seed` still works if you only want to (re)insert demo users.
+Seeding skips usernames that already exist and avoids inserting the sample listings when a listing is already present. Add user and listing seed rows in `cmd_seed` in `app/cli.py`. `python manage.py seed` also inserts the demo users and sample internships.
 
 ```bash
 python manage.py users
@@ -129,8 +131,8 @@ Commands are implemented in `app/cli.py` (stdlib `argparse`) and invoked via `ma
 
 | Command | Purpose |
 |---------|---------|
-| `python manage.py init` | Drop (default), create DB tables, and seed demo users |
-| `python manage.py seed` | Insert demo users only (also part of `init`) |
+| `python manage.py init` | Drop (default), create DB tables, and seed demo users and sample internships |
+| `python manage.py seed` | Insert demo users and sample internships (also part of `init`) |
 | `python manage.py run` | Start Uvicorn (reload unless `ENV=production`) |
 | `python manage.py users` | Print users in the DB |
 | `python manage.py transcripts` | Optional: package agent-written `docs/transcripts/*.md` into INDEX + zip (no IDE scrape) |
@@ -174,13 +176,14 @@ Service shape lives in [`render.yaml`](render.yaml) (Blueprint reference for the
    - `SECRET_KEY` — long random string
    - `ENV` — `production`
    - `PYTHON_VERSION` — `3.12.7`
+   - `ADMIN_INITIAL_PASSWORD` — set as a Render secret before the first boot of an empty database. It is used only if the seeded `admin` account does not exist. Production seeding fails rather than using the known local default if this secret is missing. Existing Administrator passwords are never changed on startup. After initial provisioning, remove the secret if no new seeded Administrator is expected. Never put its value in Git, logs, or documentation.
 5. Start command (do not drop tables on each boot):
 
 ```bash
 python manage.py init --no-drop && python manage.py run --host 0.0.0.0 --port $PORT
 ```
 
-6. Confirm the deploy is live and `GET /health` succeeds. Put the public URL and the marker logins (username, password, role) in `docs/report.md`.
+6. Confirm the deploy is live and `GET /health` succeeds. Put the public URL and the actual marker logins (username, password, role) in the final submission report. Do not use the local `admin / adminpass` default for the public deployment.
 
 Free web services sleep after inactivity. Free Postgres expires after 30 days. Do not also apply `render.yaml` in the Dashboard if the MCP already created these resources — that makes a second copy.
 

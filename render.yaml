@@ -26,6 +26,8 @@ services:
         generateValue: true
       - key: CONFIG_PASSWORD
         generateValue: true
+      - key: ADMIN_INITIAL_PASSWORD
+        sync: false
 
 databases:
   - name: faststarter-db

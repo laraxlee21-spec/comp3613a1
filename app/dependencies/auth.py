@@ -53,3 +53,13 @@ async def is_admin_dep(user: AuthDep):
     return user
 
 AdminDep = Annotated[User, Depends(is_admin_dep)]
+
+async def is_company_dep(user: AuthDep):
+    if user.role != "company":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only company accounts may access this page.",
+        )
+    return user
+
+CompanyDep = Annotated[User, Depends(is_company_dep)]

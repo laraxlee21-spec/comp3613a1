@@ -4,7 +4,7 @@
 <style>
     body {
         overflow-x: hidden;
-        background: #f4f6f8;
+        background: var(--brand-bg);
     }
 
     #wrapper {
@@ -32,13 +32,13 @@
 
     #sidebar .nav-link:hover,
     #sidebar .nav-link.active {
-        color: #fff;
-        background-color: color-mix(in srgb, var(--brand-accent) 55%, #000);
+        color: var(--brand-accent);
+        background-color: var(--brand-accent-2);
         border-radius: 0.5rem;
     }
 
     #sidebar .brand-wordmark {
-        color: #fff;
+        color: var(--brand-accent-2);
         font-size: 1.25rem;
         text-align: center;
         margin: 1rem 0 1.5rem;
@@ -50,11 +50,26 @@
         transition: all 0.3s;
         display: flex;
         flex-direction: column;
-        background-color: #f4f6f8;
+        background-color: var(--brand-bg);
     }
 
     .navbar {
-        border-bottom: 1px solid #dee2e6;
+        border-bottom: 1px solid color-mix(in srgb, var(--brand-accent) 18%, transparent);
+    }
+
+    .navbar .btn-outline-secondary {
+        color: var(--brand-accent);
+        border-color: color-mix(in srgb, var(--brand-accent) 35%, transparent);
+    }
+
+    .navbar .btn-outline-secondary:hover {
+        color: #fff;
+        background: var(--brand-accent);
+        border-color: var(--brand-accent);
+    }
+
+    #sidebar .nav-link.text-danger {
+        color: var(--brand-accent-2) !important;
     }
 </style>
 {% block additional_styles %}{% endblock %}
@@ -63,16 +78,40 @@
 {% block content %}
 <div id="wrapper">
     <nav id="sidebar" class="p-3 d-flex flex-column vh-100">
-        <div class="brand-wordmark">FastStarter</div>
+        <div class="brand-wordmark">Internship Platform</div>
 
         <ul class="nav nav-pills flex-column gap-2 flex-grow-1">
             <li class="nav-item">
-                <a class="nav-link d-flex align-items-center {{ 'active' if request.url.path.startswith('/app') }}"
-                   href="{{ url_for('user_home_view') }}">
+                <a class="nav-link d-flex align-items-center {{ 'active' if request.url.path in ['/app', '/admin', '/company'] }}"
+                   href="{{ url_for('admin_home_view') if user.role == 'admin' else (url_for('company_home_view') if user.role == 'company' else url_for('user_home_view')) }}">
                     <span class="material-symbols-outlined me-2">home</span>
-                    Home
+                    {{ 'Administrator Dashboard' if user.role == 'admin' else ('Company Dashboard' if user.role == 'company' else 'Student Dashboard') }}
                 </a>
             </li>
+            {% if user.role == 'company' %}
+            <li class="nav-item">
+                <a class="nav-link d-flex align-items-center {{ 'active' if request.url.path == '/company/listings' }}"
+                   href="{{ url_for('company_my_listings_view') }}">
+                    <span class="material-symbols-outlined me-2">work</span>
+                    My Listings
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link d-flex align-items-center {{ 'active' if request.url.path == '/company/listings/new' }}"
+                   href="{{ url_for('company_create_listing_view') }}">
+                    <span class="material-symbols-outlined me-2">add_box</span>
+                    Create Listing
+                </a>
+            </li>
+            {% elif user.role != 'admin' %}
+            <li class="nav-item">
+                <a class="nav-link d-flex align-items-center {{ 'active' if request.url.path.startswith('/app/internships') }}"
+                   href="{{ url_for('browse_internships_view') }}">
+                    <span class="material-symbols-outlined me-2">work</span>
+                    Browse Internships
+                </a>
+            </li>
+            {% endif %}
             <li class="nav-item mt-auto">
                 <a class="nav-link d-flex align-items-center text-danger" href="{{ url_for('logout') }}">
                     <span class="material-symbols-outlined me-2">logout</span>

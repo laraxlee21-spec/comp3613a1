@@ -1,6 +1,10 @@
-from sqlmodel import Field, SQLModel
-from typing import Optional
+from typing import TYPE_CHECKING
+
 from pydantic import EmailStr
+from sqlmodel import Field, Relationship, SQLModel
+
+if TYPE_CHECKING:
+    from app.models.internship import Company
 
 
 class UserBase(SQLModel,):
@@ -10,4 +14,5 @@ class UserBase(SQLModel,):
     role:str = ""
 
 class User(UserBase, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
+    id: int | None = Field(default=None, primary_key=True)
+    company: "Company | None" = Relationship(back_populates="user")

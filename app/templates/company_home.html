@@ -1,0 +1,18 @@
+{% extends "authenticated-base.html" %}
+{% block title %}Company Dashboard | Internship Platform{% endblock %}
+
+{% block subpage_content %}
+<main class="container-fluid py-2">
+  <section class="card border-0 shadow-sm">
+    <div class="card-body p-4">
+      <p class="text-uppercase small fw-semibold mb-1">Company workspace</p>
+      <h1 class="h3 mb-2">Company Dashboard</h1>
+      <p class="text-secondary">Create internship opportunities and manage your published listings.</p>
+      <div class="d-flex flex-wrap gap-2">
+        <a class="btn btn-primary" href="{{ url_for('company_create_listing_view') }}">Create Listing</a>
+        <a class="btn btn-outline-secondary" href="{{ url_for('company_my_listings_view') }}">My Listings</a>
+      </div>
+    </div>
+  </section>
+</main>
+{% endblock %}

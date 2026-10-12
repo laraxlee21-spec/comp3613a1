@@ -23,8 +23,8 @@ def _ensure_models_loaded() -> None:
 
 
 def cmd_init(args: argparse.Namespace) -> None:
-    """Create database tables (drops existing by default) and seed demo users."""
-    from app.config import get_settings
+    """Create tables (drops existing by default) and seed demo users and internships."""
+    from app.config import get_settings, mask_database_uri
     from app.database import drop_all, ensure_db_and_tables
 
     _ensure_models_loaded()
@@ -41,34 +41,54 @@ def cmd_init(args: argparse.Namespace) -> None:
             print(f"Database not ready yet while dropping ({exc}); continuing…")
     print("Creating tables…")
     ensure_db_and_tables()
-    print(f"Database ready ({get_settings().database_uri}).")
+    print(f"Database ready ({mask_database_uri(get_settings().database_uri)}).")
     if getattr(args, "seed", True):
         cmd_seed(args)
 
 
 def cmd_seed(args: argparse.Namespace) -> None:
-    """Insert demo users.
+    """Insert demo users and wireframe sample internship listings.
 
-    bob / bobpass       (regular_user)
-    admin / adminpass   (admin)
+    Local defaults: bob / bobpass (regular_user), admin / adminpass (admin).
+    Production requires ADMIN_INITIAL_PASSWORD when creating the admin account.
     """
+    from app.config import get_settings
     from app.database import ensure_db_and_tables, get_cli_session
+    from app.repositories.internship_catalog import InternshipCatalogRepository
     from app.repositories.user import UserRepository
+    from app.services.demo_seed import resolve_admin_seed_password
     from app.schemas.user import AdminCreate, RegularUserCreate
     from app.utilities.security import encrypt_password
 
     _ensure_models_loaded()
     ensure_db_and_tables()
 
+    settings = get_settings()
+    is_production = settings.env.lower() in {"prod", "production"}
     demo_users = [
         ("bob", "bob@example.com", "bobpass", "regular_user"),
-        ("admin", "admin@example.com", "adminpass", "admin"),
+        (
+            "admin",
+            "admin@example.com",
+            "adminpass",
+            "admin",
+        ),
     ]
 
     created = 0
     skipped = 0
     with get_cli_session() as session:
         repo = UserRepository(session)
+        demo_users[1] = (
+            demo_users[1][0],
+            demo_users[1][1],
+            resolve_admin_seed_password(
+                repo,
+                production=is_production,
+                admin_initial_password=settings.admin_initial_password,
+            ),
+            demo_users[1][3],
+        )
         for username, email, password, role in demo_users:
             if repo.get_by_username(username):
                 print(f"  skip  {username} (already exists)")
@@ -85,9 +105,12 @@ def cmd_seed(args: argparse.Namespace) -> None:
             )
             print(f"  create {username} ({role})")
             created += 1
+        listings_created = InternshipCatalogRepository(session).seed_demo_listings()
 
     print(f"Seed done — created {created}, skipped {skipped}.")
-    print("Login with bob/bobpass or admin/adminpass")
+    print(f"Demo internships seeded: {listings_created}.")
+    if not is_production:
+        print("Local demo logins: bob / bobpass; admin / adminpass")
 
 
 def cmd_run(args: argparse.Namespace) -> None:
@@ -221,7 +244,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     p_init = sub.add_parser(
         "init",
-        help="Create DB tables and seed demo users (drops existing tables by default)",
+        help="Create DB tables and seed demo users and internships (drops existing tables by default)",
     )
     p_init.add_argument(
         "--no-drop",
@@ -239,7 +262,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     p_seed = sub.add_parser(
         "seed",
-        help="Insert demo users only (idempotent; also runs as part of init)",
+        help="Insert demo users and sample internships (idempotent; also runs as part of init)",
     )
     p_seed.set_defaults(func=cmd_seed)
 

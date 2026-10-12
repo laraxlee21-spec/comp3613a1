@@ -371,11 +371,15 @@ async def config_clear_cache_action(request: Request):
 
 
 def _seed_demo_users() -> tuple[int, int]:
+    from app.config import get_settings
     from app.database import get_cli_session
     from app.repositories.user import UserRepository
+    from app.services.demo_seed import resolve_admin_seed_password
     from app.schemas.user import AdminCreate, RegularUserCreate
     from app.utilities.security import encrypt_password
 
+    settings = get_settings()
+    is_production = settings.env.lower() in {"prod", "production"}
     demo_users = [
         ("bob", "bob@example.com", "bobpass", "regular_user"),
         ("admin", "admin@example.com", "adminpass", "admin"),
@@ -384,6 +388,16 @@ def _seed_demo_users() -> tuple[int, int]:
     skipped = 0
     with get_cli_session() as session:
         repo = UserRepository(session)
+        demo_users[1] = (
+            demo_users[1][0],
+            demo_users[1][1],
+            resolve_admin_seed_password(
+                repo,
+                production=is_production,
+                admin_initial_password=settings.admin_initial_password,
+            ),
+            demo_users[1][3],
+        )
         for username, email, password, role in demo_users:
             if repo.get_by_username(username):
                 skipped += 1

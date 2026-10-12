@@ -1,0 +1,45 @@
+{% extends "authenticated-base.html" %}
+{% block title %}Create Internship Listing | Internship Platform{% endblock %}
+
+{% block subpage_content %}
+<main class="container py-2">
+  <div class="mb-4">
+    <p class="text-uppercase small fw-semibold mb-1">Company workspace</p>
+    <h1>Create Internship Listing</h1>
+  </div>
+
+  <form class="card border-0 shadow-sm" method="POST" action="{{ url_for('create_company_listing') }}">
+    <div class="card-body p-4">
+      <div class="mb-3">
+        <label class="form-label" for="title">Internship Title</label>
+        <input class="form-control" id="title" name="title" type="text" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label" for="description">Internship Description</label>
+        <textarea class="form-control" id="description" name="description" rows="4" required></textarea>
+      </div>
+      <div class="mb-3">
+        <label class="form-label" for="skills">Required Skills</label>
+        <textarea class="form-control" id="skills" name="skills" rows="3" required></textarea>
+      </div>
+      <div class="mb-3">
+        <label class="form-label" for="requirements">Qualifications / Requirements</label>
+        <textarea class="form-control" id="requirements" name="requirements" rows="3" required></textarea>
+      </div>
+      <div class="mb-3">
+        <label class="form-label" for="location">Location</label>
+        <input class="form-control" id="location" name="location" type="text" required>
+      </div>
+      <div class="mb-4">
+        <label class="form-label" for="number_of_positions">Number of Available Positions</label>
+        <input class="form-control" id="number_of_positions" name="number_of_positions"
+               type="number" min="1" step="1" value="1" required>
+      </div>
+      <div class="d-flex justify-content-end gap-2">
+        <a class="btn btn-outline-secondary" href="{{ url_for('company_my_listings_view') }}">Cancel</a>
+        <button class="btn btn-primary" type="submit">Publish Internship Listing</button>
+      </div>
+    </div>
+  </form>
+</main>
+{% endblock %}

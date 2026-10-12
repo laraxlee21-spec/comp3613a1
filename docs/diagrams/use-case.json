@@ -1,0 +1,30 @@
+{
+  "system": "Internship Platform",
+  "actors": [
+    {"name": "Student", "side": "left"},
+    {"name": "Company", "side": "right"},
+    {"name": "Administrator", "side": "right"}
+  ],
+  "use_cases": [
+    {
+      "name": "Submit Internship Application",
+      "actors": ["Student"],
+      "includes": [
+        "Browse Available Internship Listings",
+        "Review Internship Details and Requirements",
+        "Select Internship Position"
+      ]
+    },
+    {"name": "Browse Available Internship Listings"},
+    {"name": "Review Internship Details and Requirements"},
+    {"name": "Select Internship Position"},
+    {
+      "name": "Create Internship Listing",
+      "actors": ["Company"]
+    },
+    {
+      "name": "Initiate Matching",
+      "actors": ["Administrator"]
+    }
+  ]
+}

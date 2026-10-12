@@ -1,9 +1,46 @@
 {% extends "authenticated-base.html" %}
-{% block title %}Home{% endblock %}
+{% block title %}Student Dashboard{% endblock %}
 
 {% block subpage_content %}
 <div class="container-fluid py-2">
-  <h1 class="h4 mb-2">Home</h1>
-  <p class="text-muted mb-0">Workflow screens replace this shell in Phase 5 implement.</p>
+  <div class="card border-0 shadow-sm">
+    <div class="card-body p-4">
+      <p class="text-uppercase small fw-semibold mb-1">Your next step</p>
+      <h1 class="h4 mb-2">Student Dashboard</h1>
+      <p class="text-secondary">Explore current opportunities and apply for an internship that matches your interests.</p>
+      <a class="btn btn-primary" href="{{ url_for('browse_internships_view') }}">Browse Internships</a>
+    </div>
+  </div>
+
+  <section class="card border-0 shadow-sm mt-4" aria-labelledby="matching-results-heading">
+    <div class="card-body p-4">
+      <h2 class="h5 mb-3" id="matching-results-heading">Your Matching Results</h2>
+      {% if matches %}
+      <div class="list-group list-group-flush">
+        {% for match in matches %}
+        <article class="list-group-item px-0">
+          <div class="d-flex flex-wrap justify-content-between align-items-start gap-2">
+            <div>
+              <h3 class="h6 mb-1">{{ match.application.listing.title }}</h3>
+              <p class="mb-1">
+                <span class="text-secondary">Status:</span>
+                <span class="badge {{ 'text-bg-success' if match.match_status == 'Matched' else 'text-bg-secondary' }}">
+                  {{ match.match_status }}
+                </span>
+              </p>
+              <p class="text-secondary mb-0">Match score: {{ "%.1f"|format(match.match_score) }}%</p>
+            </div>
+            <span class="badge {{ 'text-bg-warning' if match.notification_status == 'Unread' else 'text-bg-light' }}">
+              {{ match.notification_status }}
+            </span>
+          </div>
+        </article>
+        {% endfor %}
+      </div>
+      {% else %}
+      <p class="text-secondary mb-0">No matching results are available yet.</p>
+      {% endif %}
+    </div>
+  </section>
 </div>
 {% endblock %}
