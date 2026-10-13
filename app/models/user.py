@@ -7,12 +7,13 @@ if TYPE_CHECKING:
     from app.models.internship import Company
 
 
-class UserBase(SQLModel,):
+class UserBase(SQLModel):
     username: str = Field(index=True, unique=True)
     email: EmailStr = Field(index=True, unique=True)
     password: str
-    role:str = ""
+    role: str = ""
+
 
 class User(UserBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
-    company: "Company | None" = Relationship(back_populates="user")
+    company: "Company" = Relationship(back_populates="user")
